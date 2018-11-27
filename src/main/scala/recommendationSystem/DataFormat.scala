@@ -1,9 +1,8 @@
 package recommendationSystem
 
-import java.text.SimpleDateFormat
-
 import spray.json.DefaultJsonProtocol
 
+import java.text.SimpleDateFormat
 import scala.collection.mutable.HashMap
 import scala.io.Source
 
@@ -11,9 +10,7 @@ object DataFormat {
 
   case class Business(business_id: String, name: String, categories: Option[String], state: String, city: String, address: String)
 
-  case class RawReview(user_id: String, business_id: String, stars: Int, date: String)
-
-  case class Review(user_id: String, business_id: String, stars: Int)
+  case class Review(user_id: String, business_id: String, stars: Int, date: String)
 
   object BusinessProtocol extends DefaultJsonProtocol {
     implicit val BusinessFormat = jsonFormat(Business, "business_id", "name",
@@ -21,7 +18,7 @@ object DataFormat {
   }
 
   object ReviewProtocol extends DefaultJsonProtocol {
-    implicit val ReviewFormat = jsonFormat(RawReview, "user_id", "business_id",
+    implicit val ReviewFormat = jsonFormat(Review, "user_id", "business_id",
       "stars", "date")
   }
 
@@ -39,6 +36,33 @@ object DataFormat {
     }
     return businessMap
   }
+
+  def getReviewData(filePath: String): HashMap[String, Review] = {
+
+    import ReviewProtocol._
+    import spray.json._
+
+    val source = Source.fromFile(filePath)
+    val lineIterator = source.getLines()
+    val reviewMap: HashMap[String, Review] = new HashMap[String, Review]()
+    var count = 0
+
+    for (review <- lineIterator) {
+      val reviewObj: Review = review.parseJson.convertTo[Review]
+
+      val fmt = new SimpleDateFormat("yyyy-MM-dd")
+      val reviewDate = fmt.parse(reviewObj.date)
+
+      val date = new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01")
+      if(reviewDate.after(date)) {
+        count = count + 1
+        reviewMap.put(reviewObj.user_id + "|" +reviewObj.business_id, reviewObj)
+        if(count % 1000 == 0)println(count)
+      }
+    }
+    return reviewMap
+  }
+
 
 
 
