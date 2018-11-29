@@ -39,6 +39,6 @@ object DataProcess {
     val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_user.json")
     df
   }
-
+// anything
 }
 
