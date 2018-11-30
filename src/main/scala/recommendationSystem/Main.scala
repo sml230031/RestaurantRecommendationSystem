@@ -20,5 +20,4 @@ object Main extends App {
   println("TestingNum" + testData.count())
   println(reviewDF.count())
 
-
 }
