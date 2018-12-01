@@ -3,12 +3,9 @@ package recommendationSystem
 import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
 import org.apache.spark.rdd.RDD
 
-case class ALSMatrixCons(rank: Int, numIterations: Int, lambda: Double, alpha: Double,
-                         block: Int, seed: Long, implicitPrefers: Boolean, model: ALS, reviewRdd: Rating )
-
-object ALSModelCons {
+object ALSMatrix {
   def run(rank: Int, numIterations: Int, lambda: Double, alpha: Double,
-  block: Int, seed: Long, implicitPrefers: Boolean, model: ALS, trainingRdd: RDD[Rating]): MatrixFactorizationModel = {
+          block: Int, seed: Long, implicitPrefers: Boolean, trainingRdd: RDD[Rating]): MatrixFactorizationModel = {
 
     //rank: Int, numIterations: Int, lambda: Double, alpha: Double,
     //block: Int, seed: Long, implicitPrefers: Boolean, model: ALS
@@ -22,5 +19,6 @@ object ALSModelCons {
       .run(trainingRdd)
     model
   }
+
 
 }
