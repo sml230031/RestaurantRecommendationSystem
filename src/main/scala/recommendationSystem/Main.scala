@@ -12,8 +12,10 @@ object Main extends App {
   val trainingRDD = RDD.getTrainingRDD()
   val testingRDD = RDD.getTestingRDD()
 
-  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,trainingRDD)
+  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,testingRDD)
   val topRecsForUser = model.recommendProducts(668, 6)
+
+  println("------------------- ---------------")
   for (rating <-
   topRecsForUser) { println(rating.toString()) }
   println("------------------- ---------------")

@@ -41,36 +41,5 @@ object DataProcess {
     df
   }
 
-//  def getReady(): Unit = {
-//    val businessDataFrame = getBusinessDataFrame()
-//    val reviewDataFrame = getReviewDataFrame()
-//    //  val userDataFrame = DataProcess.getUserDataFrame()
-//
-//    val businessDF = businessDataFrame
-//    val reviewDF = reviewDataFrame
-//
-//    businessDF.createOrReplaceTempView("business")
-//    reviewDF.createOrReplaceTempView("review")
-//
-//    val splits = reviewDF.randomSplit(Array(0.8, 0.2))
-//    val (trainingData, testData) = (splits(0), splits(1))
-//
-//    val reviewRdd = trainingData.rdd.map(row =>{
-//      val businessID = row.getString(0)
-//      val userID = row.getString(1)
-//      val stars = row.getString(2)
-//      Rating(businessID, userID, stars.toFloat)
-//    }
-//    )
-//
-//    val testRdd = testData.rdd.map(row =>{
-//      val businessID = row.getString(0)
-//      val userID = row.getString(1)
-//      val stars = row.getString(2)
-//      Rating(businessID,userID,stars.toFloat)
-//    }
-//    )
-//  }
-// test
 }
 
