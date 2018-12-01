@@ -1,8 +1,8 @@
 package recommendationSystem
 
+import org.apache.spark.sql.functions.{lit, to_date}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.to_date
-import org.apache.spark.sql.functions.lit
+
 
 object DataProcess {
 
@@ -12,9 +12,9 @@ object DataProcess {
       .appName("businessDataFrame")
       .master("local[2]")
       .getOrCreate()
-
-    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_business.json")
-    df.select("business_id", "name", "state", "city", "address")
+    import org.apache.spark.sql.functions._
+    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_business.json").withColumn("business_id_INT",monotonicallyIncreasingId)
+    df.select("business_id", "name", "state", "city", "address","business_id_INT")
   }
 
   def getReviewDataFrame(): DataFrame = {
@@ -36,7 +36,8 @@ object DataProcess {
       .master("local[2]")
       .getOrCreate()
 
-    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_user.json")
+    import org.apache.spark.sql.functions._
+    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_user.json").withColumn("user_id_INT",monotonicallyIncreasingId)
     df
   }
 

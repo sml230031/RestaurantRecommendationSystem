@@ -1,23 +1,23 @@
 package recommendationSystem
 
 object Main extends App {
+  val rank = 20
+  val numIterations = 15
+  val lambda = 0.10
+  val alpha = 1.00
+  val block = -1
+  val seed = 12345L
+  val implicitPrefs = false
 
+  val trainingRDD = RDD.getTrainingRDD()
+  val testingRDD = RDD.getTestingRDD()
 
-  val businessDataFrame = DataProcess.getBusinessDataFrame()
-  val reviewDataFrame = DataProcess.getReviewDataFrame()
-//  val userDataFrame = DataProcess.getUserDataFrame()
+  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,testingRDD)
+  val topRecsForUser = model.recommendProducts(668, 6)
 
-  val businessDF = businessDataFrame
-  val reviewDF = reviewDataFrame
-
-  businessDF.createOrReplaceTempView("business")
-  reviewDF.createOrReplaceTempView("review")
-
-  val splits = reviewDF.randomSplit(Array(0.8, 0.2))
-  val (trainingData, testData) = (splits(0), splits(1))
-
-  println("TrainingNum" + trainingData.count())
-  println("TestingNum" + testData.count())
-  println(reviewDF.count())
+  println("------------------- ---------------")
+  for (rating <-
+  topRecsForUser) { println(rating.toString()) }
+  println("------------------- ---------------")
 
 }
