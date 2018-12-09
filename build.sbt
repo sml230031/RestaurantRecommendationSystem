@@ -14,3 +14,5 @@ libraryDependencies ++= List("spray-json") map {c => sprayGroup %% c % sprayJson
 libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.4.0"
 
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % "2.4.0"
+
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.4.0"

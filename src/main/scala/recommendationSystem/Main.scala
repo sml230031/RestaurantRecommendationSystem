@@ -17,7 +17,7 @@ object Main extends App {
 
   println("------------------- ---------------")
   for (rating <-
-  topRecsForUser) { println(rating.toString()) }
+         topRecsForUser) { println(rating.toString()) }
   println("------------------- ---------------")
 
 }
