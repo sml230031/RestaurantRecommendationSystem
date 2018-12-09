@@ -1,5 +1,6 @@
 package recommendationSystem
 
+import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{lit, to_date}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -11,10 +12,13 @@ object DataProcess {
       .appName("businessDataFrame")
       .master("local[2]")
       .getOrCreate()
-    import org.apache.spark.sql.functions._
-    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_business.json")
-      .withColumn("business_id_INT", monotonically_increasing_id())
-      df.select("business_id", "name", "state", "city", "address", "business_id_INT", "categories")
+
+    import org.apache.spark.sql.expressions.Window
+    import org.apache.spark.sql.functions.row_number
+    val dfTemp = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_business.json")
+    val w = Window.orderBy("business_id")
+    val df = dfTemp.withColumn("business_id_INT", row_number().over(w))
+    df.select("business_id", "name", "state", "city", "address", "business_id_INT", "categories")
       .filter(df("categories").contains("Food") || df("categories").contains("food")
       || df("categories").contains("Restaurant") || df("categories").contains("restaurant"))
   }
@@ -39,8 +43,9 @@ object DataProcess {
       .getOrCreate()
 
     import org.apache.spark.sql.functions._
-    val df = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_user.json")
-      .withColumn("user_id_INT", monotonically_increasing_id())
+    val dfTemp = spark.read.json("../finalproject/yelp-dataset/yelp_academic_dataset_user.json")
+    val w = Window.orderBy("user_id")
+    val df = dfTemp.withColumn("user_id_INT", row_number().over(w))
     df
   }
 
