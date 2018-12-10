@@ -1,8 +1,8 @@
 package recommendationSystem
 
-import org.apache.spark.mllib.recommendation.{MatrixFactorizationModel, Rating}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
 
 object Main extends App {
   val rank = 20
@@ -16,16 +16,16 @@ object Main extends App {
   val trainingRDD = RDD.getTrainingRDD()
   val testingRDD = RDD.getTestingRDD()
 
-//  val spark = SparkSession
-//    .builder
-//    .appName("model")
-//    .master("local[2]")
-//    .getOrCreate()
+  val spark = SparkSession
+    .builder
+    .appName("model")
+    .master("local[2]")
+    .getOrCreate()
 
-  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,testingRDD)
+  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,trainingRDD)
 //  val savedALSModel = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,testingRDD).save(spark.sparkContext, "model/MovieRecomModel")
 //  val model = MatrixFactorizationModel.load(spark.sparkContext,"model/MovieRecomModel/")
-  val topRecsForUser = model.recommendProducts(1, 6)
+  val topRecsForUser = model.recommendProducts(1, 180000)
 
   println("------------------- ---------------")
   for (rating <-
