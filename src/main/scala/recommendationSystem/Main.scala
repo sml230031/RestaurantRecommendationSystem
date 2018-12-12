@@ -1,36 +1,15 @@
 package recommendationSystem
 
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating}
+import java.io.{BufferedReader, InputStreamReader}
 
 object Main extends App {
-  val rank = 20
-  val numIterations = 15
-  val lambda = 0.10
-  val alpha = 1.00
-  val block = -1
-  val seed = 12345L
-  val implicitPrefs = false
-
-  val trainingRDD = RDD.getTrainingRDD()
-  val testingRDD = RDD.getTestingRDD()
-
-  val spark = SparkSession
-    .builder
-    .appName("model")
-    .master("local[2]")
-    .getOrCreate()
-
-  val model = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,trainingRDD)
-//  val savedALSModel = ALSMatrix.run(rank,numIterations,lambda,alpha,block,seed,implicitPrefs,testingRDD).save(spark.sparkContext, "model/MovieRecomModel")
-//  val model = MatrixFactorizationModel.load(spark.sparkContext,"model/MovieRecomModel/")
-  val topRecsForUser = model.recommendProducts(1, 180000)
-
-  println("------------------- ---------------")
-  for (rating <-
-         topRecsForUser) { println(rating.toString()) }
-  println("------------------- ---------------")
-
+//
+  val br = new BufferedReader(new InputStreamReader(System.in))
+  val input = br.readLine
+  ModelTraining.getRecsById(input.toInt)
+//  val businessDF = DataProcess.getBusinessDataFrame()
+//  val business = businessDF.where(businessDF("business_id_INT").equalTo(918080))
+//  businessDF.show(2500)
+//  business.show()
 
 }
