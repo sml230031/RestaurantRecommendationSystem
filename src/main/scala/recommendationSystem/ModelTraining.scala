@@ -1,14 +1,17 @@
 package recommendationSystem
 
-import java.io.FileNotFoundException
-
+import org.apache.hadoop.mapred.InvalidInputException
 import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
+
+import scala.annotation.tailrec
 
 object ModelTraining {
 
   val trainingRDD = RDD.getTrainingRDD()
   val testingRDD = RDD.getTestingRDD()
+  val businessDF = DataProcess.getBusinessDataFrame().persist()
 
   val spark = SparkSession
     .builder
@@ -35,22 +38,41 @@ object ModelTraining {
       val model = MatrixFactorizationModel.load(spark.sparkContext, "model/MovieRecomModel/")
       model
     } catch {
-      case ex: FileNotFoundException => {
+      case ex: InvalidInputException=> {
         println("Model Training Start")
         ModelTraining.training
       }
     }
   }
 
+  def foldLeft(xs: List[DataFrame]): DataFrame = {
+    @tailrec
+    def inner( result: DataFrame, work: List[DataFrame] ): DataFrame = work match {
+      case Nil => result
+      case h :: t => inner(result.union(h) ,t)
+    }
+    inner(xs.head,xs)
+  }
+
+
+
+
   def getRecsById(userID: Int) : Unit = {
       val model = ModelTraining.getModel
-      val topRecsForUser = model.recommendProducts(userID, 150000)
-    println("------------------- ---------------")
-    for (rating <-
-           topRecsForUser) { println(rating.toString()) }
-    println("------------------- ---------------")
-    val rmseTest = RMSE.computeRmse(model, testingRDD, true)
-    println("Test RMSE: = " + rmseTest) //Less is better
+      val topRecsForUser = model.recommendProducts(userID, 1500)
+    for (rating <- topRecsForUser) { println(rating.toString()) }
+        println("------------------- ---------------")
+
+      val containedBusiness_Id = for (rating <- topRecsForUser) yield (rating.product, rating.rating) // select the business_Id related to UserID
+      println("Filter Start")
+
+      import org.apache.spark.sql.functions
+      val business = for (b <- containedBusiness_Id) yield businessDF.where(businessDF("business_id_INT").equalTo(b._1)).withColumn("Rating", functions.lit(b._2))
+
+      val result = foldLeft(business.toList)// Union all business datasets
+
+     result.show(1500)
+
   }
 
 }
