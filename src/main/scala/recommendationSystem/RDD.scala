@@ -17,7 +17,7 @@ object RDD {
 
   //filter business_id_INT doesn't contain number
   val joinedFilterNull = joined.filter(joined("business_id_INT").rlike("\\d+"))
-  git
+
   businessDF.createOrReplaceTempView("business")
   reviewDF.createOrReplaceTempView("review")
 
