@@ -13,14 +13,15 @@ object RDD {
     .join(businessDF, Seq("business_id"),"left_outer")
     .select("user_id_INT","business_id_INT", "user_id", "business_id", "stars")
 
+  //  userDF.write.format("csv").mode("overwrite").save("template/userJunk")
+
   //filter business_id_INT doesn't contain number
   val joinedFilterNull = joined.filter(joined("business_id_INT").rlike("\\d+"))
-  joinedFilterNull.write.format("csv").mode("overwrite").save("template/joinedJunk")
-
+  git
   businessDF.createOrReplaceTempView("business")
   reviewDF.createOrReplaceTempView("review")
 
-  val splits = joinedFilterNull.randomSplit(Array(0.7, 0.3))
+  val splits = joinedFilterNull.randomSplit(Array(0.8, 0.2))
   val (trainingData, testData) = (splits(0), splits(1))
 
   def getTrainingRDD(): RDD[Rating] = {
