@@ -28,7 +28,7 @@ object RDD {
       val user_id_INT = row.getInt(0)
       val business_id_INT = row.getInt(1)
       val stars = row.getLong(4)
-      Rating(business_id_INT.toInt, user_id_INT.toInt, stars.toDouble)
+      Rating(user_id_INT.toInt, business_id_INT.toInt, stars.toDouble)
     })
     trainingRdd
   }
