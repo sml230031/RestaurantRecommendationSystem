@@ -1,15 +1,17 @@
 package recommendationSystem
 
 import org.apache.hadoop.mapred.InvalidInputException
-import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
+import org.apache.spark.mllib.recommendation.{MatrixFactorizationModel, Rating}
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.annotation.tailrec
 
 object ModelTraining {
 
-  val trainingRDD = RDD.getTrainingRDD()
-  val testingRDD = RDD.getTestingRDD()
+  var rdd = RDD
+  val trainingRDD = rdd.getTrainingRDD()
+  val testingRDD = rdd.getTestingRDD()
   val businessDF = DataProcess.getBusinessDataFrame()
 
   val spark = SparkSession
@@ -57,8 +59,6 @@ object ModelTraining {
   def getRecsById(userID: Int, city: String) : Unit = {
     val model = ModelTraining.getModel
     val topRecsForUser = model.recommendProducts(userID, 150000)
-    for (rating <- topRecsForUser) { println(rating.toString()) }
-    println(topRecsForUser.length)
         println("------------------- ---------------")
 
 
@@ -90,5 +90,19 @@ object ModelTraining {
     print ("Filter End")
 
   }
+
+  def computeRmse(): Double = {
+    val model = getModel
+    val data = rdd.getTestingRDD()
+    val implicitPrefs = false
+    val predictions: RDD[Rating] = model.predict(data.map(x => (x.user, x.product)))
+    val predictionsAndRatings = predictions.map { x => ((x.user, x.product), x.rating) }
+      .join(data.map(x => ((x.user, x.product), x.rating))).values
+    if (implicitPrefs) { println("(Prediction, Rating)")
+      println(predictionsAndRatings.take(5).mkString("n")) }
+    math.sqrt(predictionsAndRatings.map(x => (x._1 - x._2) * (x._1 -
+      x._2)).mean())
+  }
+
 
 }
