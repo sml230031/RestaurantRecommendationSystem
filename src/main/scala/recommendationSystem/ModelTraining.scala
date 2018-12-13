@@ -54,8 +54,6 @@ object ModelTraining {
   }
 
 
-
-
   def getRecsById(userID: Int, city: String) : Unit = {
     val model = ModelTraining.getModel
     val topRecsForUser = model.recommendProducts(userID, 150000)
@@ -70,12 +68,13 @@ object ModelTraining {
     println("Filter Start")
 
     val filteredBusiness_id = businessDF.where(businessDF("city").equalTo(city)).select("business_id_INT").rdd.map(r => r(0)).collect()
-
-
+    // select business_id that related to Location
 
     val filteredBusinessDF = businessDF.where(businessDF("city").equalTo(city)).unpersist()
+    // select business
 
     val validRating  = for (f <- filteredBusiness_id; c <- containedBusiness_Id; if c._1.equals(f)) yield c
+    //select selected business's Rating data from TopRec
 
     import spark.sqlContext.implicits._
     val ratingColunm = validRating.toSeq.toDF("business_id_INT", "Rating")
@@ -88,39 +87,7 @@ object ModelTraining {
 
     BwithRatingDF.orderBy(BwithRatingDF("Rating").desc).show(false)
 
-//    validRating.foreach{ println(_)}
-
-//    val result = filteredBusinessDF.withColumn("rating",validRating)
-
     print ("Filter End")
-
-
-
-//    var i : Int = 0
-//    val list = List.apply()
-
-
-//    def getValidID : List[(Int,Double)] = {
-//      for (b <- containedBusiness_Id) {
-//        if (filteredBusinessDF.where(filteredBusinessDF("business_id_INT").equalTo(b._1)).isEmpty && i < 5) {
-//          i = i + 1
-//          list.+:(b)
-//        }
-//      }
-//      list
-//    }
-//    val validID = for (b <- containedBusiness_Id ; if filteredBusinessDF.filter(filteredBusinessDF("bussiness_id_INT").
-//    println("get valid ID")
-//    validID.foreach(println(_))
-//
-//    import org.apache.spark.sql.functions
-//
-//    val business = for (b <- validRating)
-//      yield filteredBusinessDF.where(filteredBusinessDf.withColumn("Rating", functions.lit(b._2))
-//
-//    val result = foldLeft(business.toList)// Union all business datasets
-//
-//     result.show()
 
   }
 
