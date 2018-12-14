@@ -85,7 +85,7 @@ object ModelTraining {
 
     val BwithRatingDF = filteredBusinessDF.join(ratingColunm,Seq("business_id_INT"),"left_outer").na.drop()
 
-    BwithRatingDF.orderBy(BwithRatingDF("Rating").desc).show(false)
+    BwithRatingDF.orderBy(BwithRatingDF("Rating").desc).select("name","state","city","address","Rating").show(false)
 
     print ("Filter End")
 
